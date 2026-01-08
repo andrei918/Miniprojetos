@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Common;
-using System.Net.Mail;
 using System.Globalization;
+using System.Linq; // IMPORTANTE para usar LINQ
 
 class Program
 {
@@ -17,6 +16,10 @@ class Program
             Console.WriteLine("2 - Listar tarefas");
             Console.WriteLine("3 - Remover tarefa");
             Console.WriteLine("4 - Sair");
+            Console.WriteLine("5 - Listar tarefas que vencem hoje");
+            Console.WriteLine("6 - Listar tarefas atrasadas");
+            Console.WriteLine("7 - Listar tarefas ordenadas por prazo");
+            Console.WriteLine("8 - Listar tarefas ordenadas por nome");
             Console.Write("Escolha uma opção: ");
             string? opcao = Console.ReadLine();
 
@@ -31,17 +34,15 @@ class Program
                 if (!DateTime.TryParseExact(Console.ReadLine(), "dd/MM/yyyy",
                 CultureInfo.InvariantCulture, DateTimeStyles.None, out prazo))
                 {
-                    Console.WriteLine("Data inválida:");
+                    Console.WriteLine("Data inválida.");
                     continue;
-
                 }
-
 
                 if (!string.IsNullOrWhiteSpace(descricao))
                 {
                     tarefas.Add(descricao);
                     prazos[descricao] = prazo;
-                    Console.WriteLine("Tarefa  adicionada com sucesso!");
+                    Console.WriteLine("Tarefa adicionada com sucesso!");
                 }
                 else
                 {
@@ -54,9 +55,7 @@ class Program
                 if (tarefas.Count == 0)
                 {
                     Console.WriteLine("Nenhuma tarefa cadastrada.");
-
                 }
-
                 else
                 {
                     Console.WriteLine("\nTarefas cadastradas:");
@@ -64,11 +63,8 @@ class Program
                     {
                         Console.WriteLine($"- {tarefa} (prazo: {prazos[tarefa]:dd/MM/yyyy})");
                     }
-
-
                 }
             }
-
 
             else if (opcao == "3")
             {
@@ -82,27 +78,60 @@ class Program
                 else
                 {
                     Console.WriteLine("Tarefa não encontrada.");
-
                 }
             }
-
 
             else if (opcao == "4")
             {
                 Console.WriteLine("Saindooooooo");
                 break;
+            }
 
+            else if (opcao == "5")
+            {
+                var tarefasHoje = tarefas.Where(t => prazos[t].Date == DateTime.Today);
+                Console.WriteLine("\nTarefas que vencem hoje:");
+                foreach (var tarefa in tarefasHoje)
+                {
+                    Console.WriteLine($"- {tarefa} (prazo: {prazos[tarefa]:dd/MM/yyyy})");
+                }
+            }
+
+            else if (opcao == "6")
+            {
+                var atrasadas = tarefas.Where(t => prazos[t].Date < DateTime.Today);
+                Console.WriteLine("\nTarefas atrasadas:");
+                foreach (var tarefa in atrasadas)
+                {
+                    int diasAtraso = (DateTime.Today - prazos[tarefa]).Days;
+                    Console.WriteLine($"- {tarefa} ({diasAtraso} dias atrasada)");
+                }
+            }
+
+            else if (opcao == "7")
+            {
+                var ordenadasPorPrazo = tarefas.OrderBy(t => prazos[t]);
+                Console.WriteLine("\nTarefas ordenadas por prazo:");
+                foreach (var tarefa in ordenadasPorPrazo)
+                {
+                    Console.WriteLine($"- {tarefa} (prazo: {prazos[tarefa]:dd/MM/yyyy})");
+                }
+            }
+
+            else if (opcao == "8")
+            {
+                var ordenadasPorNome = tarefas.OrderBy(t => t);
+                Console.WriteLine("\nTarefas ordenadas por nome:");
+                foreach (var tarefa in ordenadasPorNome)
+                {
+                    Console.WriteLine($"- {tarefa} (prazo: {prazos[tarefa]:dd/MM/yyyy})");
+                }
             }
 
             else
             {
-                Console.WriteLine("Opção inválida. Tente novamente. ");
-
+                Console.WriteLine("Opção inválida. Tente novamente.");
             }
-            }
-
-                    
-            }
-            }
-       
-    
+        }
+    }
+}
